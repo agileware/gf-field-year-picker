@@ -5,7 +5,7 @@
  * Description: Adds a custom Year Picker field type to Gravity Forms. Useful when you just want the user to select a year value from a range of values instead of selecting a date value.
  * Author: Agileware
  * Author URI: https://agileware.com.au
- * Version: 1.3
+ * Version: 1.3.1
  * Text Domain: gf-field-year-picker
  * Requires Plugins: gravityforms
  * 
