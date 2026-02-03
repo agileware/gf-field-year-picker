@@ -84,7 +84,7 @@ class GF_Field_YearPicker extends GF_Field {
 
         // Return an empty select field in the Gravity Form editor.
         if ($this->is_form_editor()) {
-            return "<select name='input_{$field_id}' id='input_{$form_id}_{$field_id}' class='gfield_select'></select>";
+            return "<select name='input_{$this->id}' id='input_{$form['id']}_{$this->id}' class='gfield_select'></select>";
         }
 
         $form_id = $form['id'];
