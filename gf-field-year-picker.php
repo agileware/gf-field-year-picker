@@ -90,34 +90,44 @@ class GF_Field_YearPicker extends GF_Field {
         $form_id = $form['id'];
         $field_id = $this->id;
         $placeholder = !empty($this->placeholder) ? esc_html($this->placeholder) : __('Select a Year', 'gravityforms');
+        
+        // Calculate the Default Value logic
         $default_value = !empty($this->defaultValue) ? esc_html($this->defaultValue) : '';        
-        // Replace any merge tags set as a default value for this input
-        $default_value = GFCommon::replace_variables( $default_value, $form, $entry);
+        $default_value = GFCommon::replace_variables($default_value, $form, $entry);
 
-        // TODO: Replace CiviCRM merge tags here?
-        $dropdown = "<select name='input_{$field_id}' id='input_{$form_id}_{$field_id}' class='gfield_select'>";
-        
-        // Placeholder is added and selected by default if set
-        $dropdown .= "<option value='' " . ($default_value === '' ? 'selected' : '') . ">{$placeholder}</option>";
-    
+        // VALIDATION
+        // Create a list of valid choice values first
         $valid_options = [];
-        
-        // Check the valid options BEFORE looping through choices
         if (!empty($this->choices)) {
             foreach ($this->choices as $choice) {
                 $valid_options[] = $choice['value'];
             }
         }
-    
-        // Ensure the Default Value is only selected if it's a valid option
+
+        // Ensure the Default Value is only used if it actually exists in the choices.
+        // If the admin set a default that no longer exists, we reset it to empty.
         if (!in_array($default_value, $valid_options)) {
-            $default_value = ''; // Reset to placeholder if invalid
+            $default_value = ''; 
         }
+
+        // Determine the actual selected value.
+        // If $value is not empty (meaning a submission occurred or we are editing an entry), use it.
+        // Otherwise, fall back to the calculated $default_value.
+        $selected_value = (string) $value !== '' ? $value : $default_value;
+
+        // Start the dropdown
+        $dropdown = "<select name='input_{$field_id}' id='input_{$form_id}_{$field_id}' class='gfield_select'>";
+        
+        // Placeholder is selected only if our resolved $selected_value is empty
+        $dropdown .= "<option value='' " . ((string) $selected_value === '' ? 'selected' : '') . ">{$placeholder}</option>";
     
-        // Now loop through choices and apply selection
+        // Loop through choices and apply selection
         if (!empty($this->choices)) {
             foreach ($this->choices as $choice) {
-                $selected = ($default_value == $choice['value']) ? 'selected' : '';
+                // Compare the choice against $selected_value, NOT $default_value
+                $is_selected = (string) $selected_value === (string) $choice['value'];
+                $selected = $is_selected ? 'selected' : '';
+                
                 $dropdown .= "<option value='{$choice['value']}' {$selected}>{$choice['text']}</option>";
             }
         }
